@@ -1,0 +1,19 @@
+{
+  "name": "governancecontracts",
+  "version": "1.0.0",
+  "description": "set of solidity contracts managing project governance nad rewarding",
+  "main": "index.js",
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FellowChain/GovernanceContracts.git"
+  },
+  "author": "Adam Skrodzki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FellowChain/GovernanceContracts/issues"
+  },
+  "homepage": "https://github.com/FellowChain/GovernanceContracts#readme"
+}
