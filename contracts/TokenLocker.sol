@@ -12,15 +12,15 @@ contract TokenLocker  is Ownable{
     token = FellowChainToken(_t);
   }
 
-  function getTotalLocked() view returns(uint256){
-    return _totalLocked;
+  function getTotalLocked() view public returns(uint64){
+    return uint64(_totalLocked);
   }
 
-  function getLockedAmount(address _adr) view returns(uint256){
-    return amount[_adr];
+  function getLockedAmount(address _adr) view public returns(uint64){
+    return uint64(amount[_adr]);
   }
 
-  function postponeLock(address _for,uint256 _untilTime) onlyOwner{
+  function postponeLock(address _for,uint256 _untilTime) public onlyOwner{
     if(endTime[_for]<_untilTime &&now<_untilTime){
       endTime[_for] = _untilTime;
     }
@@ -34,14 +34,14 @@ contract TokenLocker  is Ownable{
     token.transfer(msg.sender,amount[msg.sender]);
   }
 
-  function lockAllForVoting(address _benef){
+  function lockAllForVoting(address _benef)public{
       uint256 allowenceLvl = token.allowance(_benef,address(this));
       amount[_benef] = amount[_benef]+allowenceLvl;
       _totalLocked = _totalLocked+allowenceLvl;
       token.transferFrom(_benef,address(this),allowenceLvl);
   }
 
-  function lockForVoting(address _benef, uint256 value){
+  function lockForVoting(address _benef, uint256 value)public{
     uint256 allowenceLvl = token.allowance(_benef,address(this));
     require(allowenceLvl>=value);
     amount[_benef] = amount[_benef]+value;
