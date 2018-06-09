@@ -16,10 +16,10 @@ var infuraRinkebyUrl = secretData.INFURA_RINKEBY_URL;
 var sokolUrl = secretData.SOKOL_NETWORK_URL;
 var mnemonic = secretData.SECRET_MNEMONIC;
 var providerRinkeby = new HDWalletProvider(mnemonic, infuraRinkebyUrl);
-var providerMain = new HDWalletProvider(mnemonic, infuraMainUrl);
+//var providerMain = new HDWalletProvider(mnemonic, infuraMainUrl);
 var providerSokol = new HDWalletProvider(mnemonic, sokolUrl);
 
-console.log("Public key = "+provider.address);
+console.log("Public key = "+providerSokol.address);
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -42,12 +42,12 @@ module.exports = {
       network_id: 3, // eslint-disable-line camelcase
       gasPrice: "50000000000",
       gas: 8000000,
-    },
+    }/*,
     main: {
       provider: providerMain,
       network_id: 1, // eslint-disable-line camelcase
       gasPrice: "1000000000",
       gas: 5000000,
-    }
+    }*/
  }
 };
