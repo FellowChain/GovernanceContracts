@@ -13,7 +13,7 @@ contract VotingProxy{
     }
 
     function () public payable{
-        _caller.registerNewCall(msg.data,_adr,msg.value);
+        _caller.registerNewCall.value(msg.value)(msg.data,_adr,msg.value);
     }
 }
 
@@ -74,7 +74,14 @@ contract VotingContract is Ownable {
     uint32 public minorityAdvantagePercent ;
     uint32 public lowAttendanceFactor ;
     mapping(address=>address) proxies;
+    mapping(bytes32=>uint256) _customTimeSpan;
     VotingData[] public votingResults;
+
+    modifier onlyProxy(address _adr){
+
+          require(proxies[_adr]==msg.sender);
+          _;
+    }
 
     constructor(address _votesLocker) public{
         _locker = TokenLocker(_votesLocker);
@@ -126,7 +133,7 @@ contract VotingContract is Ownable {
         uint256 votingEndTime = votingResults[idx].getEndTime();
         uint256 voteFor = votingResults[idx].votesForSum();
         uint256 voteAgainst = votingResults[idx].votesAgainstSum();
-        return (voteFor> (voteAgainst*minorityAdvantagePercent/100)-(totalPossible-voteFor-voteAgainst)/lowAttendanceFactor)
+        return (voteFor> (voteAgainst*minorityAdvantagePercent/100)+(totalPossible-voteFor-voteAgainst)/lowAttendanceFactor)
                 && (votingEndTime>now) && (executed==false);
     }
 
@@ -155,12 +162,21 @@ contract VotingContract is Ownable {
         proxies[_adrToProxy] = address(new VotingProxy(_adrToProxy,address(this)));
     }
 
-    function getTime(address _adr,bytes4 header) returns(uint64){
-      return uint64(now)+uint64(votingTimeSpan);
+    function setCustomTimeSpan(address _adr,string method, uint256 _timeSpan) public onlyOwner(){
+      _customTimeSpan[keccak256(_adr,bytes4(keccak256(method)))] = _timeSpan;
     }
 
-    function registerNewCall(bytes _data,address _adr, uint256 _val) public{
-        require(proxies[_adr]==msg.sender);
+    function getTime(address _adr,bytes4 header) returns(uint64){
+      uint256 _custom = _customTimeSpan[keccak256(_adr,header)] ;
+      if (_custom>0){
+        return uint64(now)+uint64(votingTimeSpan);
+      }
+      else{
+        return uint64(now)+uint64(_custom);
+      }
+    }
+
+    function registerNewCall(bytes _data,address _adr, uint256 _val) public payable onlyProxy(_adr){
         calls.push(CallData(_data,_adr,_val,"",false));
         uint64 time = getTime(_adr,extractHead(_data));
         votingResults.push(new VotingData(time));

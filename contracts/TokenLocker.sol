@@ -34,14 +34,14 @@ contract TokenLocker  is Ownable{
     token.transfer(msg.sender,amount[msg.sender]);
   }
 
-  function lockAllForVoting(address _benef)public{
+  function lockAllForVoting(address _benef) public{
       uint256 allowenceLvl = token.allowance(_benef,address(this));
       amount[_benef] = amount[_benef]+allowenceLvl;
       _totalLocked = _totalLocked+allowenceLvl;
       token.transferFrom(_benef,address(this),allowenceLvl);
   }
 
-  function lockForVoting(address _benef, uint256 value)public{
+  function lockForVoting(address _benef, uint256 value) public{
     uint256 allowenceLvl = token.allowance(_benef,address(this));
     require(allowenceLvl>=value);
     amount[_benef] = amount[_benef]+value;
