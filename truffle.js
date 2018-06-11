@@ -40,7 +40,7 @@ module.exports = {
     sokol: {
       provider: providerSokol,
       network_id: 3, // eslint-disable-line camelcase
-      gasPrice: "50000000000",
+      gasPrice: "10000000000",
       gas: 8000000,
     }/*,
     main: {

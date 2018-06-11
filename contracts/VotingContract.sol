@@ -4,12 +4,12 @@ import './TokenLocker.sol';
 contract VotingProxy{
 
     address _adr;
-    Voting _caller;
+    VotingContract _caller;
 
     constructor(address _calledAddress, address callerAddr) public{
 
         _adr = _calledAddress;
-        _caller = Voting(callerAddr);
+        _caller = VotingContract(callerAddr);
     }
 
     function () public payable{
@@ -59,7 +59,7 @@ contract VotingData {
       }
 }
 
-contract Voting is Ownable {
+contract VotingContract is Ownable {
 
     struct CallData{
         bytes data;
@@ -155,11 +155,14 @@ contract Voting is Ownable {
         proxies[_adrToProxy] = address(new VotingProxy(_adrToProxy,address(this)));
     }
 
+    function getTime(address _adr,bytes4 header) returns(uint64){
+      return uint64(now)+uint64(votingTimeSpan);
+    }
+
     function registerNewCall(bytes _data,address _adr, uint256 _val) public{
         require(proxies[_adr]==msg.sender);
         calls.push(CallData(_data,_adr,_val,"",false));
-        uint64 time = uint64(now)+uint64(votingTimeSpan);
-
+        uint64 time = getTime(_adr,extractHead(_data));
         votingResults.push(new VotingData(time));
         emit VotingRegistered(_adr,_data);
     }
