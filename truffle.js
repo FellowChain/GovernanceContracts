@@ -31,6 +31,12 @@ module.exports = {
      gas: 5000000,
      network_id: '*', // eslint-disable-line camelcase
    },
+    test: {
+      host: 'localhost',
+      port: 8545,
+      gas: 5000000,
+      network_id: '*', // eslint-disable-line camelcase
+    },
     rinkeby: {
       provider: providerRinkeby,
       network_id: 4, // eslint-disable-line camelcase

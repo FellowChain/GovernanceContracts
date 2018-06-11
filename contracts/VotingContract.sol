@@ -78,12 +78,12 @@ contract VotingContract is Ownable {
 
     constructor(address _votesLocker) public{
         _locker = TokenLocker(_votesLocker);
+        owner = msg.sender;
     }
 
     function init() public{
         require(proxies[address(this)]==address(0));
         proxies[address(this)] = address(new VotingProxy(address(this),address(this)));
-        owner = address(this);
         votingTimeSpan = 24*3600*7;
         minorityAdvantagePercent = 200;
         lowAttendanceFactor = 5;
