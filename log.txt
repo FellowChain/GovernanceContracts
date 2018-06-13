@@ -1,0 +1,56 @@
+Public key = 0x8df5a5add9c1cc36d0f306e82df6af7533bff25f
+Using network 'sokol'.
+
+Running migration: 1_initial_migration.js
+  Replacing Migrations...
+  ... 0x656f30df9523c98279738cb4c46d9473640b25327508ffa8b8653ee679065d91
+  Migrations: 0x83063f8877a33b017b2442c48c655ecfad4f0cda
+Saving successful migration to network...
+  ... 0xc6e682d031a9cbffaab303972874eeec3ff2b67d7f67eb1b517ccedf4055a8b7
+Saving artifacts...
+Running migration: 2_migrate_contracts.js
+deploy NameRegistry with params []
+  Replacing NameRegistry...
+  ... 0x02ffc2ed12b295cb4e4a772ffce410c3ff6c6809141a562ed725bcaef26da88c
+  NameRegistry: 0xbc9dc8cd4b87af17ba41bae085ebdad81f573832
+Saving artifacts...
+deploy FellowChainToken with params []
+  Deploying FellowChainToken...
+  ... 0x56992e2dcbde2adb0eaeb864b51a379e1b428e92fba85e8beea1e0ed0d5750ef
+  FellowChainToken: 0x77340960e63e4503336d93f926c651b66e49192f
+set addr tok 0x77340960e63e4503336d93f926c651b66e49192f
+  ... 0xc0287717400be1807b20a43405ed50608d3d4d4caf6022707801547d0281ed8b
+deploy TokenLocker with params ["0x77340960e63e4503336d93f926c651b66e49192f"]
+  Deploying TokenLocker...
+  ... 0x411ab12657672335299d69e6be3f3a6dab6ad55111f23019a0e45b121aaad402
+  TokenLocker: 0x78d63d8f13a2ae0da117696e8950abe165b91d82
+set addr lkr 0x78d63d8f13a2ae0da117696e8950abe165b91d82
+  ... 0x341cb662b71838f07de31ed9945310373ab9c285395336ef6c242867f5ac3e50
+  ... 0x087ab6c9f2178f5babc3d765ccf09fe9b47542067b91d00caacf0839d0807a40
+deploy DevelopmentFund with params ["0x77340960e63e4503336d93f926c651b66e49192f"]
+  Deploying DevelopmentFund...
+  ... 0xee292401665befeb505f011d5dfa3dbc571eeeb32915c8e1d4aba9020a001887
+  DevelopmentFund: 0x5ed8787cb61cf706067816f33fc6f71687ba8209
+set addr devFund 0x5ed8787cb61cf706067816f33fc6f71687ba8209
+  ... 0x2d0cfa033f67a5204fee3b9e01f2371cd10e3adec13c5a8e43283ac473b5a440
+deploy VotingContract with params ["0x78d63d8f13a2ae0da117696e8950abe165b91d82"]
+  Deploying VotingContract...
+  ... 0xc3016d57dba10879661688fed81356b41542add9783d3d3585f61b6a199c4654
+  VotingContract: 0x52e7680cd29db7a9aa48b69b4610032f88d78bcf
+set addr vote 0x52e7680cd29db7a9aa48b69b4610032f88d78bcf
+  ... 0xe1e145e36a8a34dc194073bd4d929254e9c5a87a6cdfa0a38fd4e09ec1b45766
+  ... 0x78db8a4a20edda4a99659dc24b7b702fbcb7999c9e5d8da464df8456c149adc0
+vote.init()
+  ... 0xcd4bceca6c1b3f7a649974981ef8dce26e4dbb86ed34963437cb85e2853731e2
+vote.registerProxy('tok')
+  ... 0x984341d11cf7ffa80dd20e04ee46b0d57572714de6ba080b8bcdfd3f2dfdba3c
+vote.registerProxy('lkr')
+  ... 0xdd631fcbda86807c701f387997fc3f900cddf09ef1cd7a5bddc0b5e99703832e
+vote.registerProxy('devFund')
+  ... 0x2427ca461d261b4dde6595c5d70820fe927d71787002429e4605409080c1cd4e
+tok.transferOwnership('vote')
+  ... 0xcd1f236277fce0086a3ea30f46aaeedd7b863c838f56d67592668120abd5fb07
+lkr.transferOwnership('vote')
+  ... 0x6dfff9079e339baf57eb73bbf944261621183d20c819f17d4b0d3e3edca93a5e
+vote.transferOwnership('vote')
+  ... 0x9354c3228d7f1309467b13bef00d6bf00edb4f18d9f925cf96943932d9c9b4df

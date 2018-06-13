@@ -21,13 +21,13 @@ contract DevelopmentFund  is Ownable{
     emit TokenSold(msg.sender,(msg.value*(10**token.decimals())/price));
   }
 
-  function payForWorkInToken(address _beneficiary,uint256 value) onlyOwner() public{
+  function payForWorkInToken(address _beneficiary,uint256 value,bytes32 workDone) onlyOwner() public{
         require(token.balanceOf(address(this))>=value);
         token.transfer(_beneficiary,value);
         emit DonationPayed(_beneficiary,value);
     }
 
-  function payForWorkInEth(address _beneficiary,uint256 value) onlyOwner(){
+  function payForWorkInEth(address _beneficiary,uint256 value,bytes32 workDone) onlyOwner(){
        require(this.balance>=value);
        _beneficiary.transfer(value);
        emit DonationPayedEth(_beneficiary,value);

@@ -1,4 +1,4 @@
-//import latestTime from 'zeppelin-solidity/test/helpers/latestTime';
+import latestTime from 'zeppelin-solidity/test/helpers/latestTime';
 import { advanceBlock } from 'zeppelin-solidity/test/helpers/advanceToBlock';
 import { increaseTimeTo, duration } from 'zeppelin-solidity/test/helpers/increaseTime';
 const Token = artifacts.require('FellowChainToken');

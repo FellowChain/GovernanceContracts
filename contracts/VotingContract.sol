@@ -191,6 +191,7 @@ contract VotingContract is Ownable {
             }
             return (bytes4(_val));
         }
+
     event VotingRegistered(address _to,bytes _data);
     event DecisionExecuted(uint256 idx,address voting);
     event VoteCasted(address indexed voter, uint64 power,uint256 caseIdx,bool votingFor);

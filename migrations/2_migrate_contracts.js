@@ -36,13 +36,13 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){return deployContract(deployer,Token, [],'tok');})
   .then(function(){return deployContract(deployer,TokenLocker, [data['tok'].address],'lkr');})
   .then(function(){return data['tok'].init();})
+  .then(function(){return deployContract(deployer,DevelopmentFund, [data['tok'].address],'devFund');})
+  .then(function(){return deployContract(deployer,VotingContract, [data['lkr'].address],'vote');})
   .then(function(){
       return data['tok'].balanceOf(accounts[0])
             .then(function(balance){
-              return data['tok'].transfer(data['lkr'].address,balance);})
+              return data['tok'].transfer(data['devFund'].address,balance);})
           })
-  .then(function(){return deployContract(deployer,DevelopmentFund, [data['tok'].address],'devFund');})
-  .then(function(){return deployContract(deployer,VotingContract, [data['lkr'].address],'vote');})
   .then(function(){ console.log("vote.init()"); return data['vote'].init();})
   .then(function(){ console.log("vote.registerProxy('tok')"); return data['vote'].registerProxy(data['tok'].address);})
   .then(function(){ console.log("vote.registerProxy('lkr')"); return data['vote'].registerProxy(data['lkr'].address);})
