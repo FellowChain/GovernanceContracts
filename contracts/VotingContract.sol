@@ -166,9 +166,13 @@ contract VotingContract is Ownable {
       _customTimeSpan[keccak256(_adr,bytes4(keccak256(method)))] = _timeSpan;
     }
 
-    function getTime(address _adr,bytes4 header) returns(uint64){
+   function sendOwnFunds(address _destination) public onlyOwner(){
+      (address(_destination)).transfer(this.balance);
+   }
+
+   function getTime(address _adr,bytes4 header) returns(uint64){
       uint256 _custom = _customTimeSpan[keccak256(_adr,header)] ;
-      if (_custom>0){
+      if (_custom==0){
         return uint64(now)+uint64(votingTimeSpan);
       }
       else{

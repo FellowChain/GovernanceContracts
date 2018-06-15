@@ -26,27 +26,39 @@ contract TokenLocker  is Ownable{
     }
   }
 
+  function isWithdrawPossible(address person) view public returns(bool){
+    return now>endTime[person];
+  }
+
   function withdraw() public{
     require(now>endTime[msg.sender]);
     _totalLocked = _totalLocked - amount[msg.sender];
-    amount[msg.sender]=0;
-    endTime[msg.sender]=0;
-    token.transfer(msg.sender,amount[msg.sender]);
+    if(token.transfer(msg.sender,amount[msg.sender])){ 
+      amount[msg.sender]=0;
+      endTime[msg.sender]=0;
+    }
   }
 
-  function lockAllForVoting(address _benef) public{
-      uint256 allowenceLvl = token.allowance(_benef,address(this));
-      amount[_benef] = amount[_benef]+allowenceLvl;
-      _totalLocked = _totalLocked+allowenceLvl;
-      token.transferFrom(_benef,address(this),allowenceLvl);
+  function lockAllForVoting() public{
+      uint256 allowenceLvl = token.allowance(msg.sender,address(this));
+      if(allowenceLvl>token.balanceOf(msg.sender)){
+        allowenceLvl = token.balanceOf(msg.sender);
+      }
+      if(token.transferFrom(msg.sender,address(this),allowenceLvl)){
+        amount[msg.sender] = amount[msg.sender]+allowenceLvl;
+        _totalLocked = _totalLocked+allowenceLvl;
+        endTime[msg.sender]=now;
+      }
   }
 
-  function lockForVoting(address _benef, uint256 value) public{
-    uint256 allowenceLvl = token.allowance(_benef,address(this));
+  function lockForVoting(uint256 value) public{
+    uint256 allowenceLvl = token.allowance(msg.sender,address(this));
     require(allowenceLvl>=value);
-    amount[_benef] = amount[_benef]+value;
-    _totalLocked = _totalLocked+value;
-    token.transferFrom(_benef,address(this),value);
+    if(token.transferFrom(msg.sender,address(this),value)){
+      amount[msg.sender] = amount[msg.sender]+value;
+      _totalLocked = _totalLocked+value;
+      endTime[msg.sender]=now;
+    }
   }
 
   event DonationPayed(address indexed _benef,uint256 value);

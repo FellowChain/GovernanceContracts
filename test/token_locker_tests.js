@@ -21,16 +21,17 @@ const TokenLocker = artifacts.require('TokenLocker');
           const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
           beforeEach(async function () {
               data.token = await Token.new();
-              await Promise.all([data.token.init(),
-                TokenLocker.new(data.token.address)]).then(function(a,b){
-                  data.locker = b;
+              return Promise.all([data.token.init(),
+                TokenLocker.new(data.token.address)]).then(function(args){
+                  data.locker = args[1];
                   return true;
                 }).then(function(){
                   return Promise.all([
                     data.token.transfer(otherAddr1,1000),
                     data.token.transfer(otherAddr2,1000),
                     data.token.transfer(otherAddr3,1000)
-                  ]);
+                  ]).then(function(){
+                  });
                 });
 
           });
@@ -38,16 +39,24 @@ const TokenLocker = artifacts.require('TokenLocker');
           describe('lockAllForVoting', function () {
 
             beforeEach(async function () {
-                /*
-                  set allowence
-                */
+                await data.token.approve(data.locker.address,
+                  "10000000000000000000000000000",
+                  {from:otherAddr1});
+
             });
 
-            it('should transfer amount equal to allowence',async function(){
+            it('should transfer allTokens to locker',async function(){
+              var balanceBefore = (await data.token.balanceOf(otherAddr1));
+              await data.locker.lockAllForVoting({from:otherAddr1});
+              var amount = await data.locker.amount(otherAddr1);
+              var balanceAfter = (await data.token.balanceOf(otherAddr1));
+              console.log(balanceBefore.toString(),balanceAfter.toString(),amount.toString());
+              assert.isTrue(0==balanceAfter);
+              assert.isTrue(balanceBefore.toString()==amount.toString());
             });
+
             it('should not change sum of allowence and amount',async function(){
-            });
-            it('should increase total locked',async function(){
+
             });
           });
 
