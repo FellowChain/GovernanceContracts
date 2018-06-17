@@ -69,34 +69,34 @@ const NameRegistry = artifacts.require('NameRegistry');
             });
 
             it('owner should be able to transfer tokens',async function(){
-              await data.devFund.payForWorkInEth(otherAddr2,"1000");
+              await data.devFund.payForWorkInEth(otherAddr2,"1000","0x0");
             });
 
             it('transfer should emit DonationPayed',async function(){
-              var promise = data.devFund.payForWorkInEth(otherAddr2,"1000");
+              var promise = data.devFund.payForWorkInEth(otherAddr2,"1000","0x0");
               var {logs} = await promise;
               assert(logs[0].event==="DonationPayedEth",'incorrect event name');
             });
 
             it('not owner should fail to transfer tokens',async function(){
-              var promise = data.devFund.payForWorkInEth(otherAddr2,"1000",{from:otherAddr1});
+              var promise = data.devFund.payForWorkInEth(otherAddr2,"1000","0x0",{from:otherAddr1});
               assertRevert(promise);
             });
           });
 
           describe('pay for work in tokens', function () {
             it('owner should be able to transfer tokens',async function(){
-              await data.devFund.payForWorkInToken(otherAddr2,"1000");
+              await data.devFund.payForWorkInToken(otherAddr2,"1000","0x0");
             });
 
             it('transfer should emit DonationPayed',async function(){
-              var promise = data.devFund.payForWorkInToken(otherAddr2,"1000");
+              var promise = data.devFund.payForWorkInToken(otherAddr2,"1000","0x0");
               var {logs} = await promise;
 				      assert(logs[0].event==="DonationPayed",'incorrect event name');
             });
 
             it('not owner should fail to transfer tokens',async function(){
-              var promise = data.devFund.payForWorkInToken(otherAddr2,"1000",{from:otherAddr1});
+              var promise = data.devFund.payForWorkInToken(otherAddr2,"1000","0x0",{from:otherAddr1});
               assertRevert(promise);
             });
           });
