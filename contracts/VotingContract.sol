@@ -56,7 +56,9 @@ contract VotingData {
             votesAgainstSum = votesAgainstSum + voteCount - votesAgainst[voter];
           }
           require (votesFor[voter]==0 || votesAgainst[voter]==0);
+          emit VoteCasted(votesForSum,votesAgainstSum,voter,voteCount,votedFor);
       }
+      event VoteCasted(uint votesFor,uint votesAgainst,address voter,uint voterVotesCount,bool voteDirection);
 }
 
 contract VotingContract is Ownable {
@@ -73,8 +75,8 @@ contract VotingContract is Ownable {
     uint32 public votingTimeSpan ;
     uint32 public minorityAdvantagePercent ;
     uint32 public lowAttendanceFactor ;
-    mapping(address=>address) proxies;
-    mapping(bytes32=>uint256) _customTimeSpan;
+    mapping(address=>address) public proxies;
+    mapping(bytes32=>uint256) public _customTimeSpan;
     VotingData[] public votingResults;
 
     modifier onlyProxy(address _adr){
@@ -184,7 +186,7 @@ contract VotingContract is Ownable {
         calls.push(CallData(_data,_adr,_val,"",false));
         uint64 time = getTime(_adr,extractHead(_data));
         votingResults.push(new VotingData(time));
-        emit VotingRegistered(_adr,_data);
+        emit VotingRegistered(_adr,_data,calls.length-1,time,address(votingResults[votingResults.length-1]));
     }
 
 
@@ -196,7 +198,7 @@ contract VotingContract is Ownable {
             return (bytes4(_val));
         }
 
-    event VotingRegistered(address _to,bytes _data);
+    event VotingRegistered(address _to,bytes _data, uint256 indexed callIdx, uint256 time, address votingContract);
     event DecisionExecuted(uint256 idx,address voting);
     event VoteCasted(address indexed voter, uint64 power,uint256 caseIdx,bool votingFor);
 }
