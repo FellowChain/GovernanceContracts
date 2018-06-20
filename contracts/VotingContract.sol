@@ -51,9 +51,11 @@ contract VotingData {
           }
           if(votedFor){
             votesForSum = votesForSum + voteCount - votesFor[voter];
+            votesFor[voter] = voteCount;
           }
           if(votedFor==false){
             votesAgainstSum = votesAgainstSum + voteCount - votesAgainst[voter];
+            votesAgainst[voter] = voteCount;
           }
           require (votesFor[voter]==0 || votesAgainst[voter]==0);
           emit VoteCasted(votesForSum,votesAgainstSum,voter,voteCount,votedFor);
@@ -68,6 +70,7 @@ contract VotingContract is Ownable {
         address adr;
         uint256 val;
         string method;
+        bytes32 hash;
         bool isExecuted;
     }
     CallData[] public calls ;
@@ -88,6 +91,10 @@ contract VotingContract is Ownable {
     constructor(address _votesLocker) public{
         _locker = TokenLocker(_votesLocker);
         owner = msg.sender;
+    }
+
+    function updateLocker(address _votesLocker) public onlyOwner(){
+      _locker = _votesLocker;
     }
 
     function init() public{
@@ -139,6 +146,22 @@ contract VotingContract is Ownable {
                 && (votingEndTime>now) && (executed==false);
     }
 
+    function isFinished(uint256 idx) view public returns(bool){
+
+        uint256 votingEndTime = votingResults[idx].getEndTime();
+    }
+
+    function cancel(uint256 idx) public{
+      uint256 votingEndTime = votingResults[idx].getEndTime();
+      if(votingEndTime<now && isAccepted(idx)==false){
+        calls[idx].isExecuted = true;
+        DecisionDeclined(idx,address(votingResults[idx]));
+      }
+      else{
+        revert();
+      }
+    }
+
     function execute(uint256 idx) public {
         if(isAccepted(idx)){
             if(calls[idx].adr.call.value(calls[idx].val)(calls[idx].data)==false){
@@ -153,8 +176,9 @@ contract VotingContract is Ownable {
         }
     }
 
-    function addMnemonic(string _method,uint256 idx) public{
+    function addMnemonic(string _method, bytes32 hash,uint256 idx) public{
         calls[idx].method=_method;
+        calls[idx].hash = hash ;
         bytes4 prefix=extractHead(calls[idx].data);
         require(bytes4(keccak256(bytes(_method)))==prefix);
     }
@@ -183,7 +207,7 @@ contract VotingContract is Ownable {
     }
 
     function registerNewCall(bytes _data,address _adr, uint256 _val) public payable onlyProxy(_adr){
-        calls.push(CallData(_data,_adr,_val,"",false));
+        calls.push(CallData(_data,_adr,_val,"",bytes32(0),false));
         uint64 time = getTime(_adr,extractHead(_data));
         votingResults.push(new VotingData(time));
         emit VotingRegistered(_adr,_data,calls.length-1,time,address(votingResults[votingResults.length-1]));
@@ -200,5 +224,6 @@ contract VotingContract is Ownable {
 
     event VotingRegistered(address _to,bytes _data, uint256 indexed callIdx, uint256 time, address votingContract);
     event DecisionExecuted(uint256 idx,address voting);
+    event DecisionDeclined(uint256 idx,address voting);
     event VoteCasted(address indexed voter, uint64 power,uint256 caseIdx,bool votingFor);
 }
