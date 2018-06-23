@@ -94,7 +94,7 @@ contract VotingContract is Ownable {
     }
 
     function updateLocker(address _votesLocker) public onlyOwner(){
-      _locker = _votesLocker;
+      _locker = TokenLocker(_votesLocker);
     }
 
     function init() public{
