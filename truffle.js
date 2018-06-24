@@ -13,7 +13,7 @@ var HDWalletProvider = require("truffle-hdwallet-provider");
 
 
 var infuraRinkebyUrl = secretData.INFURA_RINKEBY_URL;
-var infuraRopstenUrl = secretData.INFURA_RINKEBY_URL.replace("rinkeby","ropsten");
+var infuraRopstenUrl = secretData.INFURA_ROPSTEN_URL;
 var sokolUrl = secretData.SOKOL_NETWORK_URL;
 var infuraMainUrl = secretData.CORE_NETWORK_URL;
 var coreUrl = secretData.CORE_NETWORK_URL;
