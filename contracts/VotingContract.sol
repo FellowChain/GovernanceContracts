@@ -185,6 +185,7 @@ contract VotingContract is Ownable {
 
     function registerProxy(address _adrToProxy) public onlyOwner(){
         require(proxies[_adrToProxy]==address(0));
+        require(Ownable(_adrToProxy).owner()==address(this) || _adrToProxy == address(this));
         proxies[_adrToProxy] = address(new VotingProxy(_adrToProxy,address(this)));
     }
 

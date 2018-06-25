@@ -44,20 +44,20 @@ module.exports = {
     rinkeby: {
       provider: providerRinkeby,
       network_id: 4, // eslint-disable-line camelcase
-      gasPrice: "1000000000",
+      gasPrice: "10000000000",
       gas: 5000000,
     },
     ropsten: {
       provider: providerRopsten,
       network_id: 3, // eslint-disable-line camelcase
-      gasPrice: "1000000000",
+      gasPrice: "10000000000",
       gas: 5000000,
     },
     sokol: {
       provider: providerSokol,
       network_id: 99, // eslint-disable-line camelcase
       gasPrice: "10000000000",
-      gas: 8000000,
+      gas: 5000000,
     },
     main: {
       provider: providerMain,
