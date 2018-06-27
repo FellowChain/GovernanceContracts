@@ -136,14 +136,14 @@ contract VotingContract is Ownable {
       not voting is like 1/5 against to prevent decision made with very low
       attendence rate
     */
-    function isAccepted(uint256 idx) private view returns(bool){
+    function isAccepted(uint256 idx) public view returns(bool){
         uint256 totalPossible = _locker.getTotalLocked();
         bool executed = calls[idx].isExecuted;
         uint256 votingEndTime = votingResults[idx].getEndTime();
         uint256 voteFor = votingResults[idx].votesForSum();
         uint256 voteAgainst = votingResults[idx].votesAgainstSum();
         return (voteFor> (voteAgainst*minorityAdvantagePercent/100)+(totalPossible-voteFor-voteAgainst)/lowAttendanceFactor)
-                && (votingEndTime>now) && (executed==false);
+                && (votingEndTime<now) && (executed==false);
     }
 
     function isFinished(uint256 idx) view public returns(bool){

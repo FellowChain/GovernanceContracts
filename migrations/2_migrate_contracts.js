@@ -9,6 +9,10 @@ var DevelopmentFund = artifacts.require("./DevelopmentFund.sol");
 module.exports = function(deployer,network,accounts) {
   var authorAddress = "0xe2915bb06ca06a97df3dbb8289b319912192609b";
   var pendingTransactions = {};
+
+    if(network=='test'){
+      return;
+    }
   web3.eth.filter("pending", function(error, result){
     if (!error)
     {
@@ -30,9 +34,6 @@ module.exports = function(deployer,network,accounts) {
 
   var data = {};
 
-  if(network=='test'){
-    return;
-  }
   return deployer.deploy(NameRegistry).then(
     function(){
       return NameRegistry.deployed()
@@ -83,7 +84,7 @@ module.exports = function(deployer,network,accounts) {
           data['tok'].balanceOf(accounts[0])
           .then(function(balance){
             console.log("transfer tokens to "+data['devFund'].address+" "+(balance*99/100).toString());
-              console.log("transfer tokens to "+authorAddress+" "+(balance*1/100).toString());
+            console.log("transfer tokens to "+authorAddress+" "+(balance*1/100).toString());
             Promise.all([data['tok'].transfer(data['devFund'].address,balance*99/100),
                          data['tok'].transfer(authorAddress,balance*1/100)]).then(function(a,b){
                            console.log("transfer finish");
