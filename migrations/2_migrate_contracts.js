@@ -45,6 +45,13 @@ module.exports = function(deployer,network,accounts) {
     }
   )
   .then(function(){
+    return new Promise((res,rej)=>{
+      setInterval(function(){
+        res(true);
+      },30000)
+    })
+  })
+  .then(function(){
     return deployer.deploy(FellowChainToken).then(function(){
       return FellowChainToken.deployed()
     })
@@ -66,6 +73,13 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){
     return data['reg'].setAddress('lkr',data['lkr'].address) ;
   })
+  .then(function(){
+    return new Promise((res,rej)=>{
+      setInterval(function(){
+        res(true);
+      },30000)
+    })
+  })
   .then(function(){return data['tok'].init();})
   .then(function(){
       return deployer.deploy(DevelopmentFund,data['tok'].address).then(function(){
@@ -85,32 +99,46 @@ module.exports = function(deployer,network,accounts) {
           .then(function(balance){
             console.log("transfer tokens to "+data['devFund'].address+" "+(balance*99/100).toString());
             console.log("transfer tokens to "+authorAddress+" "+(balance*1/100).toString());
-            Promise.all([data['tok'].transfer(data['devFund'].address,balance*99/100),
-                         data['tok'].transfer(authorAddress,balance*1/100)]).then(function(a,b){
-                           console.log("transfer finish");
-                           res(true);
-                         }).catch(function(e){
-                           rej(e);
-                           console.log("transfer Failed "+e);
-                         });
+            data['tok'].transfer(data['devFund'].address,balance*99/100).then(function(){
+              data['tok'].transfer(authorAddress,balance*1/100)}).then(function(a,b){
+                             console.log("transfer finish");
+                             res(true);
+                           });
+            }).catch(function(e){
+              console.log("transfer Failed "+e);
+              rej(e);
+            });
         })
-
-      })
-
+  })
+  .then(function(){
+    return new Promise((res,rej)=>{
+      setInterval(function(){
+        res(true);
+      },30000)
+    })
   })
   .then(function(){
     return deployer
       .deploy(VotingContract,data['lkr'].address)
       .then(function(){
+          console.log("Voting deployed");
           return VotingContract.deployed()
         })
         .then(function(instance){
+            console.log("Voting deployment assignment");
             data['vote'] = instance;
             return true;
           })
   })
   .then(function(){
     return data['reg'].setAddress('vote',data['vote'].address) ;
+  })
+  .then(function(){
+    return new Promise((res,rej)=>{
+      setInterval(function(){
+        res(true);
+      },30000)
+    })
   })
   .then(function(){
     console.log("tok.transferOwnership"); return data['tok'].transferOwnership(data['vote'].address) ;
