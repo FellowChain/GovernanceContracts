@@ -5,12 +5,7 @@ contract FellowChainToken is MintableToken {
 
 	string public constant name = "Fellow Chain Token";
 	string public constant symbol = "FCT";
-	uint256 public constant DECIMALS = 8;
 	uint256 public constant decimals = 8;
-
-  constructor() public{
-    owner = msg.sender;
-  }
 
   function burn(address _a,uint256 amount) public {
     uint256 _b = balanceOf(_a);
@@ -20,14 +15,9 @@ contract FellowChainToken is MintableToken {
   }
 	function init() public{
 
-	    if(totalSupply()==0){
-    	    mintingFinished = false;
-
-    	    mint(address(owner),(10**DECIMALS)*(10000000));
-    	    mintingFinished = true;
-	    }
-	    else{
-	        revert();
-	    }
+	   require(totalSupply_ == 0);
+			
+			mint(address(owner),(10**DECIMALS)*(10000000));
+    	mintingFinished = true;
 	}
 }
