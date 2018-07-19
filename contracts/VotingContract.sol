@@ -156,8 +156,7 @@ contract VotingContract is Ownable {
     // }
 
     function cancel(uint256 idx) public{
-        uint256 votingEndTime = votingResults[idx].endTime;
-        require(votingEndTime < now && isAccepted(idx) == false);
+        require(votingResults[idx].endTime < now && isAccepted(idx) == false);
 
         calls[idx].isExecuted = true;
         emit DecisionDeclined(idx);
@@ -222,7 +221,7 @@ contract VotingContract is Ownable {
     }
 
     event VotingRegistered(address _to,bytes _data, uint256 indexed callIdx, uint256 time);
-    event DecisionExecuted(uint256 idx);
-    event DecisionDeclined(uint256 idx);
+    event DecisionExecuted(uint256 indexed idx);
+    event DecisionDeclined(uint256 indexed idx);
     event VoteCasted(address indexed voter, uint64 power,uint256 caseIdx,bool votingFor);
 }
