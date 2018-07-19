@@ -20,7 +20,7 @@ contract VotingProxy{
 
 contract VotingContract is Ownable {
 
-    uint64 constant VOTES_MASK = 2**64-1;
+    uint64 constant VOTES_MASK = 2**64;
 
     struct CallData{
         address adr;
@@ -107,8 +107,8 @@ contract VotingContract is Ownable {
 
         VotingData storage votingData = votingResults[callIndex];
 
-        uint64 votesAgainst = uint64(votingData.votes[voter]) & VOTES_MASK;
-        uint64 votesFor = uint64(votingData.votes[voter] / (2**64));
+        uint64 votesAgainst = uint64(votingData.votes[voter]) & (VOTES_MASK-1);
+        uint64 votesFor = uint64(votingData.votes[voter] / VOTES_MASK);
 
         if(votedFor && votesAgainst > 0){
             votingData.votesAgainstSum = votingData.votesAgainstSum-votesAgainst;
