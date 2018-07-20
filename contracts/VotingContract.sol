@@ -21,7 +21,7 @@ contract VotingProxy{
 
 contract VotingContract is Ownable {
 
-    uint64 constant VOTES_MASK = 2**64;
+    uint128 constant VOTES_MASK = 2**64;
 
     struct CallData{
         address adr;
@@ -109,8 +109,8 @@ contract VotingContract is Ownable {
 
         VotingData storage votingData = votingResults[callIndex];
 
-        uint64 votesAgainst = uint64(votingData.votes[voter]) & (VOTES_MASK-1);
-        uint64 votesFor = uint64(votingData.votes[voter] / VOTES_MASK);
+        uint64 votesAgainst = uint64(votingData.votes[voter]) & uint64(VOTES_MASK-1);
+        uint64 votesFor = uint64(votingData.votes[voter] / uint64(VOTES_MASK));
 
         if(votedFor && votesAgainst > 0){
             votingData.votesAgainstSum = votingData.votesAgainstSum-votesAgainst;
@@ -181,8 +181,7 @@ contract VotingContract is Ownable {
     }
 
     function registerProxy(address _adrToProxy) public onlyOwner(){
-        require(proxies[_adrToProxy]==address(0)
-        || _adrToProxy == address(this))// if is true first require will catch it, TODO Explain
+        require(proxies[_adrToProxy]==address(0) || _adrToProxy == address(this));// if is true first require will catch it, TODO Explain
         require(Ownable(_adrToProxy).owner()==address(this));
 
         proxies[_adrToProxy] = address(new VotingProxy(_adrToProxy,address(this)));
