@@ -12,7 +12,8 @@ contract VotingProxy{
         _caller = VotingContract(callerAddr);
     }
 
-    //everyone can call this - voting DDoS !  
+    //everyone can call this - voting DDoS !
+    //TODO implement deposit for creation of voting so DDoS is not possible
     function () public payable{
         _caller.registerNewCall.value(msg.value)(msg.data,_adr);
     }
@@ -45,7 +46,7 @@ contract VotingContract is Ownable {
 
     CallData[] public calls ;
     TokenLocker _locker;
-   
+
     mapping(address=>address) public proxies;
     mapping(bytes32=>uint256) public _customTimeSpan;
     VotingData[] public votingResults;
@@ -60,9 +61,9 @@ contract VotingContract is Ownable {
         _locker = TokenLocker(_votesLocker);
     }
 
-    //TODO should be any check is _votesLocker an instance of TokenLocker ? 
     function updateLocker(address _votesLocker) public onlyOwner(){
         _locker = TokenLocker(_votesLocker);
+        _locker.lockAllForVoting();//should throw if not locker
     }
 
     function init(uint32 _span) public{
@@ -102,7 +103,8 @@ contract VotingContract is Ownable {
         emit VoteCasted(msg.sender, votesAmount,callIndex,isFor);
     }
 
-    //TODO is voteCount will not cause overflow ?? 
+    //TODO is voteCount will not cause overflow ??
+    //Not for 8 decimals - voteCount is equal to number of locked tokens
     function voteInternal(uint256 callIndex, address voter,uint64 voteCount,bool votedFor) private {
 
         VotingData storage votingData = votingResults[callIndex];
@@ -118,7 +120,7 @@ contract VotingContract is Ownable {
             votingData.votesForSum = votingData.votesForSum-votesFor;
             votesFor = 0;
         }
-        
+
         if(votedFor){
             votingData.votesForSum = votingData.votesForSum + voteCount - votesFor;
             votesFor = voteCount;
@@ -138,7 +140,7 @@ contract VotingContract is Ownable {
       attendence rate
     */
     function isAccepted(uint256 idx) public view returns(bool){
-        
+
         bool isNotExecuted = calls[idx].isExecuted == false;
         bool isVotingPending = votingResults[idx].endTime < now;
 
@@ -164,7 +166,7 @@ contract VotingContract is Ownable {
 
     function execute(uint256 idx) public {
         require(isAccepted(idx));
-        
+
         require(calls[idx].adr.call.value(calls[idx].val)(calls[idx].data));
 
         calls[idx].isExecuted = true;
@@ -179,15 +181,15 @@ contract VotingContract is Ownable {
     }
 
     function registerProxy(address _adrToProxy) public onlyOwner(){
-        require(proxies[_adrToProxy]==address(0));
-        // || _adrToProxy == address(this) if is true first require will catch it 
+        require(proxies[_adrToProxy]==address(0)
+        || _adrToProxy == address(this))// if is true first require will catch it, TODO Explain
         require(Ownable(_adrToProxy).owner()==address(this));
 
         proxies[_adrToProxy] = address(new VotingProxy(_adrToProxy,address(this)));
     }
 
-    function setCustomTimeSpan(address _adr,bytes4 method, uint256 _timeSpan) public onlyOwner(){
-        _customTimeSpan[keccak256(_adr,method)] = _timeSpan;
+    function setCustomTimeSpan(address _adr,string method, uint256 _timeSpan) public onlyOwner(){
+        _customTimeSpan[keccak256(_adr,bytes4(keccak256(method)))] = _timeSpan;
     }
 
     function sendOwnFunds(address _destination) public onlyOwner(){
