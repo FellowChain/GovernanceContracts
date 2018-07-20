@@ -4,7 +4,16 @@ var VotingContract = artifacts.require("./VotingContract.sol");
 var NameRegistry = artifacts.require("./NameRegistry.sol");
 var DevelopmentFund = artifacts.require("./DevelopmentFund.sol");
 
-
+function pause(timeoutVal){
+  return function(){
+    return
+      new Promise((res,rej)=>{
+        setInterval(function(){
+          res(true);
+        },timeoutVal);
+      })
+    };
+}
 
 module.exports = function(deployer,network,accounts) {
   var authorAddress = "0xe2915bb06ca06a97df3dbb8289b319912192609b";
@@ -44,13 +53,7 @@ module.exports = function(deployer,network,accounts) {
       data['reg'] = instance;
     }
   )
-  .then(function(){
-    return new Promise((res,rej)=>{
-      setInterval(function(){
-        res(true);
-      },30000)
-    })
-  })
+  .then(pause(30000))
   .then(function(){
     return deployer.deploy(FellowChainToken).then(function(){
       return FellowChainToken.deployed()
@@ -73,13 +76,7 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){
     return data['reg'].setAddress('lkr',data['lkr'].address) ;
   })
-  .then(function(){
-    return new Promise((res,rej)=>{
-      setInterval(function(){
-        res(true);
-      },30000)
-    })
-  })
+  .then(pause(30000))
   .then(function(){return data['tok'].init();})
   .then(function(){
       return deployer.deploy(DevelopmentFund,data['tok'].address).then(function(){
@@ -110,13 +107,7 @@ module.exports = function(deployer,network,accounts) {
             });
         })
   })
-  .then(function(){
-    return new Promise((res,rej)=>{
-      setInterval(function(){
-        res(true);
-      },30000)
-    })
-  })
+  .then(pause(30000))
   .then(function(){
     return deployer
       .deploy(VotingContract,data['lkr'].address)
@@ -133,15 +124,9 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){
     return data['reg'].setAddress('vote',data['vote'].address) ;
   })
+  .then(pause(30000))
   .then(function(){
-    return new Promise((res,rej)=>{
-      setInterval(function(){
-        res(true);
-      },30000)
-    })
-  })
-  .then(function(){
-    console.log("tok.transferOwnership"); return data['tok'].transferOwnership(data['vote'].address) ;
+    console.log("tok.transferOwnership"); return data['tok'].transferOwnership(data['devFund'].address) ;
   })
   .then(function(){
     console.log("lkr.transferOwnership");  return data['lkr'].transferOwnership(data['vote'].address) ;
@@ -149,7 +134,6 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){
     console.log("devFund.transferOwnership"); return data['devFund'].transferOwnership(data['vote'].address) ;
   })
-  .then(function(){ console.log("vote.registerProxy('tok'-"+data['tok'].address+")"); return data['vote'].registerProxy(data['tok'].address);})
   .then(function(){ console.log("vote.registerProxy('lkr')"); return data['vote'].registerProxy(data['lkr'].address);})
   .then(function(){ console.log("vote.registerProxy('devFund')"); return data['vote'].registerProxy(data['devFund'].address);})
   .then(function(){
