@@ -1,6 +1,5 @@
 
-var secretData = require('./secrets.js');
-
+var secretData = require("./secrets.json");
 require('dotenv').config();
 require('babel-register');
 require('babel-polyfill');

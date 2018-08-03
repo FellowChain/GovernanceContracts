@@ -6,10 +6,12 @@ var DevelopmentFund = artifacts.require("./DevelopmentFund.sol");
 
 function pause(timeoutVal){
   return function(){
-    return
-      new Promise((res,rej)=>{
-        setInterval(function(){
+    console.log('Pause executed');
+    return new Promise((res,rej)=>{
+        console.log("Stert timer "+timeoutVal);
+        setTimeout(function(){
           res(true);
+          console.log("End timer "+timeoutVal);
         },timeoutVal);
       })
     };
@@ -43,7 +45,8 @@ module.exports = function(deployer,network,accounts) {
 
   var data = {};
 
-  return deployer.deploy(NameRegistry).then(
+  return deployer.deploy(NameRegistry)
+  .then(
     function(){
       return NameRegistry.deployed()
     }
@@ -51,11 +54,14 @@ module.exports = function(deployer,network,accounts) {
   .then(
     function(instance){
       data['reg'] = instance;
+      return true;
     }
   )
   .then(pause(30000))
-  .then(function(){
-    return deployer.deploy(FellowChainToken).then(function(){
+  .then(function(retVal){
+    console.log("after "+retVal);
+    return deployer.deploy(FellowChainToken)
+    .then(function(){
       return FellowChainToken.deployed()
     })
     .then(function(instance){
@@ -66,8 +72,9 @@ module.exports = function(deployer,network,accounts) {
     return data['reg'].setAddress('tok',data['tok'].address) ;
   })
   .then(function(){
-    return deployer.deploy(TokenLocker,data['tok'].address).then(function(){
-      return TokenLocker.deployed()
+    return deployer.deploy(TokenLocker,data['tok'].address)
+    .then(function(){
+      return TokenLocker.deployed();
     })
     .then(function(instance){
         data['lkr'] = instance;
@@ -96,8 +103,11 @@ module.exports = function(deployer,network,accounts) {
           .then(function(balance){
             console.log("transfer tokens to "+data['devFund'].address+" "+(balance*99/100).toString());
             console.log("transfer tokens to "+authorAddress+" "+(balance*1/100).toString());
-            data['tok'].transfer(data['devFund'].address,balance*99/100).then(function(){
-              data['tok'].transfer(authorAddress,balance*1/100)}).then(function(a,b){
+            data['tok'].transfer(data['devFund'].address,balance*99/100)
+            .then(function(){
+              data['tok'].transfer(authorAddress,balance*1/100)})
+              .then(pause(30000))
+              .then(function(a,b){
                              console.log("transfer finish");
                              res(true);
                            });
@@ -107,10 +117,15 @@ module.exports = function(deployer,network,accounts) {
             });
         })
   })
+  .then(()=>{
+
+      console.log("Waiting before voting");
+  })
   .then(pause(30000))
   .then(function(){
     return deployer
       .deploy(VotingContract,data['lkr'].address)
+      .then(pause(30000))
       .then(function(){
           console.log("Voting deployed");
           return VotingContract.deployed()
@@ -128,22 +143,28 @@ module.exports = function(deployer,network,accounts) {
   .then(function(){
     console.log("tok.transferOwnership"); return data['tok'].transferOwnership(data['devFund'].address) ;
   })
+  .then(pause(30000))
   .then(function(){
     console.log("lkr.transferOwnership");  return data['lkr'].transferOwnership(data['vote'].address) ;
   })
+  .then(pause(30000))
   .then(function(){
     console.log("devFund.transferOwnership"); return data['devFund'].transferOwnership(data['vote'].address) ;
   })
+  .then(pause(30000))
   .then(function(){ console.log("vote.registerProxy('lkr')"); return data['vote'].registerProxy(data['lkr'].address);})
+  .then(pause(30000))
   .then(function(){ console.log("vote.registerProxy('devFund')"); return data['vote'].registerProxy(data['devFund'].address);})
+  .then(pause(30000))
   .then(function(){
     var value = 600;
     if(network==99){
-      value = 3600*24*7;
+      value = 3600*24;
     }
     console.log("vote.init("+value+")");
 
     return data['vote'].init(value);})
+  .then(pause(30000))
   .then(function(){
     console.log("vote.transferOwnership");
     return data['vote'].transferOwnership(data['vote'].address);})
