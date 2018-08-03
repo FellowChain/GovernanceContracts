@@ -12,7 +12,9 @@ npm install -g truffle
 then 
 
 truffle compile
+
 truffle migrate 
+
 truffle test 
 
 
