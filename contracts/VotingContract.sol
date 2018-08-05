@@ -3,8 +3,8 @@ import "./TokenLocker.sol";
 
 contract VotingProxy{
 
-    address _adr;
-    VotingContract _caller;
+    address public _adr;
+    VotingContract public _caller;
 
     constructor(address _calledAddress, address callerAddr) public{
 
@@ -91,16 +91,16 @@ contract VotingContract is Ownable {
     }
 
     function vote(uint256 callIndex,bool isFor) public{
-
         uint time = votingResults[callIndex].endTime;
-
-        require(time > now);
+        uint timeNow = now;
+        require(time > timeNow);
 
         _locker.postponeLock(msg.sender,time);
         uint64 votesAmount = _locker.getLockedAmount(msg.sender);
 
         voteInternal(callIndex, msg.sender,votesAmount,isFor);
         emit VoteCasted(msg.sender, votesAmount,callIndex,isFor);
+
     }
 
     //TODO is voteCount will not cause overflow ??
@@ -109,8 +109,9 @@ contract VotingContract is Ownable {
 
         VotingData storage votingData = votingResults[callIndex];
 
-        uint64 votesAgainst = uint64(votingData.votes[voter]) & uint64(VOTES_MASK-1);
-        uint64 votesFor = uint64(votingData.votes[voter] / uint64(VOTES_MASK));
+        uint votesCount = votingData.votes[voter];
+        uint64 votesAgainst = uint64(votesCount & VOTES_MASK-1);
+        uint64 votesFor = uint64(votesCount / VOTES_MASK);
 
         if(votedFor && votesAgainst > 0){
             votingData.votesAgainstSum = votingData.votesAgainstSum-votesAgainst;
@@ -132,7 +133,8 @@ contract VotingContract is Ownable {
 
         require (votesFor == 0 || votesAgainst == 0);
 
-        votingData.votes[voter] = (votesFor * (2**64)) | votesAgainst;
+        votingData.votes[voter] = (uint256(votesFor) * (2**64)) | votesAgainst;
+
     }
 
     /*conservative, there must be twice that much people for than against
@@ -208,6 +210,7 @@ contract VotingContract is Ownable {
     function registerNewCall(bytes _data,address _adr) public payable onlyProxy(_adr){
         calls.push(CallData(_adr,false,_data,msg.value,""));
         uint time = getTime(_adr,extractHead(_data));
+        emit VotingTimeSet(now,time);
         votingResults.push(VotingData(0,0,time));
         emit VotingRegistered(_adr,_data,calls.length-1,time);
     }
@@ -224,5 +227,6 @@ contract VotingContract is Ownable {
     event VotingRegistered(address _to,bytes _data, uint256 indexed callIdx, uint256 time);
     event DecisionExecuted(uint256 indexed idx);
     event DecisionDeclined(uint256 indexed idx);
+    event VotingTimeSet(uint256 indexed time,uint256 indexed endTime);
     event VoteCasted(address indexed voter, uint64 power,uint256 caseIdx,bool votingFor);
 }

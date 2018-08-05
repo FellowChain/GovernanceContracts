@@ -6,24 +6,25 @@ var DevelopmentFund = artifacts.require("./DevelopmentFund.sol");
 
 function pause(timeoutVal){
   return function(){
-    console.log('Pause executed');
+//    console.log('Pause executed');
     return new Promise((res,rej)=>{
-        console.log("Stert timer "+timeoutVal);
+  //      console.log("Stert timer "+timeoutVal);
         setTimeout(function(){
           res(true);
-          console.log("End timer "+timeoutVal);
-        },timeoutVal);
+  //        console.log("End timer "+timeoutVal);
+        },0);
       })
     };
 }
 
 module.exports = function(deployer,network,accounts) {
-  var authorAddress = "0xe2915bb06ca06a97df3dbb8289b319912192609b";
+  var authorAddress = "0xdecefa2655ac1f4e48f838a1d7c42041ca352cf7";
   var pendingTransactions = {};
 
     if(network=='test'){
       return;
     }
+    /*
   web3.eth.filter("pending", function(error, result){
     if (!error)
     {
@@ -42,7 +43,7 @@ module.exports = function(deployer,network,accounts) {
       })
     }
   });
-
+*/
   var data = {};
 
   return deployer.deploy(NameRegistry)
