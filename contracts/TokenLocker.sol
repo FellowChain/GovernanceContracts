@@ -5,15 +5,15 @@ contract TokenLocker  is Ownable{
 
     FellowChainToken token;
 
-    // amount of tokens locked for each account  
+    // amount of tokens locked for each account
     mapping(address => uint256)public amount ;
 
     //locked end time for each account
     mapping(address => uint256)public endTime ;
 
-    //total of locked tokens 
+    //total of locked tokens
     uint256 public _totalLocked ;
-    
+
     constructor(address _t) public{
       //done by Ownable contract
           //owner = msg.sender;
@@ -22,11 +22,11 @@ contract TokenLocker  is Ownable{
 
     //TODO  why to cast from uint to uint64 ??
     function getTotalLocked() view public returns(uint64){
-        return uint64(_totalLocked);
+        return uint64(_totalLocked/(10**token.decimals()));
     }
 
     function getLockedAmount(address _adr) view public returns(uint64){
-        return uint64(amount[_adr]);
+        return uint64(amount[_adr]/(10**token.decimals()));
     }
 
     function postponeLock(address _for,uint256 _untilTime) public onlyOwner{
@@ -41,11 +41,11 @@ contract TokenLocker  is Ownable{
 
     function withdraw() public{
         require(now>endTime[msg.sender]);
-          
+
         _totalLocked =- amount[msg.sender];
-            
-        require(token.transfer(msg.sender,amount[msg.sender])); 
-            
+
+        require(token.transfer(msg.sender,amount[msg.sender]));
+
         amount[msg.sender] = 0;
         endTime[msg.sender] = 0;
     }
@@ -53,7 +53,7 @@ contract TokenLocker  is Ownable{
     function lockAllForVoting() public {
         uint256 allowenceLvl = token.allowance(msg.sender,address(this));
         uint balance = token.balanceOf(msg.sender);
-          
+
         if(allowenceLvl>balance)
           allowenceLvl = balance;
 
@@ -65,7 +65,7 @@ contract TokenLocker  is Ownable{
         require(allowenceLvl>=value);
 
         lockInternal(value);
-    }  
+    }
 
     function lockInternal(uint _value) private {
           //if accout balance is not sufficientit funnction will fail
@@ -77,7 +77,7 @@ contract TokenLocker  is Ownable{
 
     }
 
-    //TODO not used 
+    //TODO not used
     event DonationPayed(address indexed _benef,uint256 value);
     event DonationPayedEth(address indexed _benef,uint256 value);
 }

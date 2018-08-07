@@ -11,14 +11,14 @@ function pause(timeoutVal){
   //      console.log("Stert timer "+timeoutVal);
         setTimeout(function(){
           res(true);
-  //        console.log("End timer "+timeoutVal);
-        },0);
+          console.log("End timer "+timeoutVal);
+        },timeoutVal);
       })
     };
 }
 
 module.exports = function(deployer,network,accounts) {
-  var authorAddress = "0xdecefa2655ac1f4e48f838a1d7c42041ca352cf7";
+  var authorAddress = "0x58c6deDE9e15B9AEcb501a5c265E12d49E189d68";
   var pendingTransactions = {};
 
     if(network=='test'){
