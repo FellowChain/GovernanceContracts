@@ -16,19 +16,6 @@ contract TargetFund  is Ownable{
     fundsRole = _fundsRole;
   }
 
-  //TODO why owner cant lower the price ??
-  function setPrice(uint256 _newPrice) onlyOwner() public{
-    require(_newPrice>price);
-    price = _newPrice;
-  }
-
-  function () payable public{
-    uint value = (msg.value*(10**token.decimals())/price);
-
-    token.transfer(msg.sender,value);
-    emit TokenSold(msg.sender,value);
-  }
-
   function donateInToken(address _beneficiary,uint256 value) onlyOwner() public{
         require(token.balanceOf(address(this))>=value);
         token.transfer(_beneficiary,value);
@@ -40,7 +27,6 @@ contract TargetFund  is Ownable{
        _beneficiary.transfer(value);
        emit DonationPayedEth(_beneficiary,value);
     }
-
 
   event DonationPayed(address indexed _benef,uint256 value);
   event TokenSold(address indexed _benef,uint256 amount);
