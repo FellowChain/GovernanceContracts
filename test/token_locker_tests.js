@@ -55,7 +55,7 @@ const TokenLocker = artifacts.require('TokenLocker');
               assert.isTrue(balanceBefore.toString()==amount.toString());
             });
 
-            it('should not change sum of allowence and amount',async function(){
+            it('should not change sum of allowence of locker amount and supply on locker accout',async function(){
 
             });
           });
